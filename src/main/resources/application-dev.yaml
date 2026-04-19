@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: blog-platform-api
+
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres    #I know this is Hardcoded but This helps me test locally without setting up env vars every time it should like this ${DB_USERNAME}
+    password: admin1234    # ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/blog-db
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+
+  flyway:
+    enabled: false
+
+
+logging:
+  level:
+    org:
+      springdoc: DEBUG
+
+
+
+security:
+  jwt:
+    secret-key: MY_SUPER_SECRET_KEY_123456789_123456789          # ${JWT_SECRET} it should
+    expiration: 3600000  # 24 hours
+
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
