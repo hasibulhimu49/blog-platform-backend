@@ -1,13 +1,14 @@
 package com.example.blog_platform_api.user.controller;
 
+import com.example.blog_platform_api.common.response.ApiResponse;
 import com.example.blog_platform_api.user.dto.response.UserResponseDto;
 import com.example.blog_platform_api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,74 +16,45 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@AllArgsConstructor
-@Tag(name = "User Management API", description = "APIs for managing users in the system")
+@RequiredArgsConstructor
+@Tag(name = "Users", description = "Admin-only: manage and moderate users")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
-
 
     private final UserService service;
 
 
-    //Get all Users
-    @Operation(summary = "Get all users", description = "Retrieve a list of all registered users")
-/*
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved users"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-*/
 
+    @Operation(summary = "Get all users", description = "Admin only — returns a list of all registered users")
     @GetMapping
-    public List<UserResponseDto> getAllUser() {
-        return service.getAllUser();
+    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
+        return ResponseEntity.ok(ApiResponse.success(service.getAllUser()));
     }
 
 
 
-
-    //Get Users by id
-    @Operation(summary = "Get user by ID", description = "Retrieve a specific user by their unique ID")
-/*    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found"),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })*/
+    @Operation(summary = "Get user by ID", description = "Admin only — retrieve a specific user by their ID")
     @GetMapping("/{id}")
-    public UserResponseDto getUserById(
-            @Parameter(description = "ID of the user to be retrieved", example = "1")
-            @PathVariable Long id
-    ) {
-        return service.getUserById(id);
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(
+            @Parameter(description = "User ID") @PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(service.getUserById(id)));
     }
 
 
 
-
-    //Block Users
-    @Operation(summary = "Block user", description = "Block a user by their ID")
-/*    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User block successfully"),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })*/
+    @Operation(summary = "Block user", description = "Admin only — blocks a user, preventing them from logging in")
     @PatchMapping("/{id}/block")
-    public ResponseEntity<?> blockUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> blockUser(@PathVariable Long id) {
         service.blockUser(id);
-        return ResponseEntity.ok("User blocked successfully");
+        return ResponseEntity.ok(ApiResponse.success("User blocked successfully", null));
     }
 
 
 
-    //Unblock Users
-    @Operation(summary = "Unblock user", description = "Unblock a user by their ID")
-/*
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User Unblock  successfully"),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })
-*/
-
+    @Operation(summary = "Unblock user", description = "Admin only — restores a blocked users access")
     @PatchMapping("/{id}/unblock")
-    public ResponseEntity<?> unblockUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> unblockUser(@PathVariable Long id) {
         service.unblockUser(id);
-        return ResponseEntity.ok("User unblocked successfully");
+        return ResponseEntity.ok(ApiResponse.success("User unblocked successfully", null));
     }
 }

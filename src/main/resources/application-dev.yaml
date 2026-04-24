@@ -2,11 +2,10 @@ spring:
   application:
     name: blog-platform-api
 
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: postgres    #I know this is Hardcoded but This helps me test locally without setting up env vars every time it should like this ${DB_USERNAME}
-    password: admin1234    # ${DB_PASSWORD}
+    username: postgres
+    password: admin1234
     url: jdbc:postgresql://localhost:5432/blog-db
 
   jpa:
@@ -18,31 +17,29 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-
   mvc:
     problemdetails:
       enabled: true
 
-
   flyway:
     enabled: false
 
+server:
+  port: 8080
 
 logging:
   level:
-    org:
-      springdoc: DEBUG
-
-
+    com.example.blog_platform_api: DEBUG
+    org.springframework.security: INFO
 
 security:
   jwt:
-    secret-key: MY_SUPER_SECRET_KEY_123456789_123456789          # ${JWT_SECRET} it should
-    expiration: 3600000  # 24 hours
-
+    secret-key: dGhpcyBpcyBhIHN1cGVyIHNlY3JldCBrZXkgZm9yIGJsb2cgcGxhdGZvcm0gand0IDI1NiBiaXRz   # Base64-encoded 256-bit key for HS256.
+    expiration: 86400000  # 24 hours in milliseconds
 
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
+    path: /swagger-ui.html

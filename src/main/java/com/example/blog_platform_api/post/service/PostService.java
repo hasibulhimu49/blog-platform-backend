@@ -1,9 +1,10 @@
 package com.example.blog_platform_api.post.service;
 
 import com.example.blog_platform_api.post.dto.request.PostCreateRequestDto;
+import com.example.blog_platform_api.post.dto.request.PostUpdateRequestDto;
 import com.example.blog_platform_api.post.dto.response.PostResponseDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PostService {
 
@@ -11,9 +12,15 @@ public interface PostService {
 
     PostResponseDto getPostById(Long id);
 
-    List<PostResponseDto> getAllPosts();
+    Page<PostResponseDto> getAllPosts(Pageable pageable);
 
-    PostResponseDto updatePost(Long id, PostCreateRequestDto dto);
+    Page<PostResponseDto> getMyPosts(Pageable pageable);
+
+    Page<PostResponseDto> getPostsByUser(Long userId, Pageable pageable);
+
+    Page<PostResponseDto> searchPosts(String keyword, Pageable pageable);
+
+    PostResponseDto updatePost(Long id, PostUpdateRequestDto dto);
 
     void deletePost(Long id);
 }

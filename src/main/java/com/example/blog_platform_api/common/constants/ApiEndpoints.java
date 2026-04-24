@@ -6,51 +6,42 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiEndpoints {
 
-    private static final String API_VERSION="/api/v1";
-    private static final String BASE_ADMIN="/admin";
-
+    private static final String API_VERSION = "/api/v1";
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static  class ProductAdmin {
-        public static final String BASE_PRODUCT_ADMIN=API_VERSION + BASE_ADMIN +"/products";
+    public static class Auth {
+        public static final String BASE = API_VERSION + "/auth";
+        public static final String REGISTER = BASE + "/register";
+        public static final String LOGIN = BASE + "/login";
+        public static final String LOGOUT = BASE + "/logout";
+        public static final String ME = BASE + "/me";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class ProductPublic
-    {
-        public static final String BASE_PRODUCT_PUBLIC=API_VERSION + "/products";
-    }
-
-
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class CategoryAdmin{
-        public static final String BASE_CATEGORY_ADMIN=API_VERSION + BASE_ADMIN +"/categories";
+    public static class Posts {
+        public static final String BASE = API_VERSION + "/posts";
+        public static final String BY_ID = BASE + "/{id}";
+        public static final String MY_POSTS = BASE + "/my";
+        public static final String SEARCH = BASE + "/search";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class CategoryPublic{
-        public static final String BASE_CATEGORY_PUBLIC=API_VERSION + "/categories";
-    }
-
-
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class InventoryAdmin{
-        public static final String BASE_INVENTORY_ADMIN=API_VERSION + BASE_ADMIN + "/inventory";
-    }
-
-
-
-
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Cart {
-        public static final String BASE_CART = API_VERSION + "/cart";
+    public static class Comments {
+        public static final String BASE = API_VERSION + "/posts/{postId}/comments";
+        public static final String BY_ID = BASE + "/{commentId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class CartItem {
-        public static final String BASE_CART_ITEMS = API_VERSION + "/cart/items";
+    public static class Tags {
+        public static final String BASE = API_VERSION + "/tags";
+        public static final String BY_ID = BASE + "/{id}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Users {
+        public static final String BASE = API_VERSION + "/users";
+        public static final String BY_ID = BASE + "/{id}";
+        public static final String BLOCK = BY_ID + "/block";
+        public static final String UNBLOCK = BY_ID + "/unblock";
     }
 }

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: blog-platform-api
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+  flyway:
+    enabled: false
+
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    com.example.blog_platform_api: INFO
+    org.springframework.security: WARN
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

@@ -1,6 +1,5 @@
 package com.example.blog_platform_api.config;
 
-
 import com.example.blog_platform_api.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,79 +21,79 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-        return daoAuthenticationProvider;
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
+                                                         PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                            JwtAuthenticationFilter jwtAuthFilter) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
+            .authorizeHttpRequests(auth -> auth
 
-        http.csrf((csrf) -> csrf.disable()).cors(cors -> {})
-                .authorizeHttpRequests((auth) -> auth
+                // Infrastructure
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/").permitAll()
 
-                                .requestMatchers("/actuator/health").permitAll()
-                                .requestMatchers("/").permitAll()
+                // Swagger / OpenAPI
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
 
-                                //Swagger and OpenAPI - exact paths only at start or end
-                                .requestMatchers(
-                                        "/swagger-ui/**",
-                                        "/swagger-ui.html",
-                                        "/v3/api-docs/**",
-                                        "/v3/api-docs",
-                                        "/swagger-resources/**",
-                                        "/webjars/**"
-                                ).permitAll()
+                // Auth — public
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/auth/me").authenticated()
 
+                // Posts — read is public, write requires USER role
+                .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/posts").hasRole("USER")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").hasRole("USER")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/**").hasAnyRole("USER", "ADMIN")
 
-                                //SecurityFilterChain (Request-level authorization).akhane request URL + HTTP method onojayi access control aet kora hoic
-                                // Auth APIs (Register/Login)
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                // Comments — read is public, write requires authentication
+                .requestMatchers(HttpMethod.GET, "/api/v1/posts/*/comments/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/posts/*/comments/**").hasRole("USER")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/posts/*/comments/**").hasRole("USER")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/*/comments/**").hasAnyRole("USER", "ADMIN")
 
+                // Tags — read is public, write requires ADMIN
+                .requestMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/tags/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/tags/**").hasRole("ADMIN")
 
+                // Users — admin only
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("ADMIN")
 
-                                // Users API → Admin only
-                                // .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
-
-                                // GET (read)
-                                .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole("ADMIN")
-                                // PATCH (block/unblock)
-                                .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("ADMIN")
-
-
-
-
-                                //Best Practice ( j kno 1 jaigai likle e hbe controller a na likle controller clean thake)
-                                // Post
-                                .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/posts").hasAnyRole("USER")
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").hasAnyRole("USER")
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/**").hasAnyRole("USER", "ADMIN")
-
-
-                                // Everything else
-                                .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // Everything else requires authentication
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-
     }
 }

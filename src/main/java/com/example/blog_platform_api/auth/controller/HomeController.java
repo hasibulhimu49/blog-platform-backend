@@ -1,25 +1,31 @@
 package com.example.blog_platform_api.auth.controller;
 
+import com.example.blog_platform_api.common.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Hidden;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.HashMap;
+
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Hidden
 @RestController
 public class HomeController {
 
     @GetMapping("/")
-    public Map<String, Object> home() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Welcome to Blog Platform API");
-        response.put("version", "1.0.0");
-        response.put("status", "running");
-        response.put("documentation", "/swagger-ui/index.html");
-        response.put("apiDocs", "/v3/api-docs");
-        response.put("health", "/actuator/health");
-        response.put("github", "https://github.com/hasibulhimu49/blog-platform-backend");
-        response.put("developer", "Mohammad Hasibul Hasan");
-        response.put("email", "hasibulx26@gmail.com");
-        return response;
+    public ResponseEntity<ApiResponse<Map<String, Object>>> home() {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("name", "Blog Platform API");
+        info.put("version", "1.0.0");
+        info.put("status", "running");
+        info.put("timestamp", LocalDateTime.now());
+        info.put("documentation", "/swagger-ui/index.html");
+        info.put("apiDocs", "/v3/api-docs");
+        info.put("health", "/actuator/health");
+        info.put("github", "https://github.com/hasibulhimu49/blog-platform-backend");
+        info.put("developer", "Mohammad Hasibul Hasan");
+        return ResponseEntity.ok(ApiResponse.success("Blog Platform API is running", info));
     }
 }

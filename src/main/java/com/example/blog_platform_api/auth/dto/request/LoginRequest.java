@@ -1,17 +1,14 @@
 package com.example.blog_platform_api.auth.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+public record LoginRequest(
 
-public record LoginRequest (
-        @NotNull(message = "can not be null")
-        @Size(min = 3,max = 15,message = "3 to 15")
+        @NotBlank(message = "Username cannot be blank")
+        @Size(min = 3, max = 15, message = "Username must be between 3 and 15 characters")
         String username,
 
-        @NotNull(message = "Password can not be null")
+        @NotBlank(message = "Password cannot be blank")
         String password
-
-
-)
-{ }
+) {}
